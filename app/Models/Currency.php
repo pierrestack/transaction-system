@@ -25,4 +25,9 @@ class Currency extends Model
     {
         return $this->hasMany(ExchangeRate::class, 'target_currency_id');
     }
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
+    }
 }

@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Filament\Resources\Accounts\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+
+class AccountsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('account_number')
+                    ->label('Number')
+                    ->searchable(),
+                TextColumn::make('balance')
+                    ->numeric()
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->currency->symbol)
+                    ->sortable(),
+                TextColumn::make('status')
+                    ->badge()
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}
