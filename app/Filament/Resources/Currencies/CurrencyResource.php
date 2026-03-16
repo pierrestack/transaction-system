@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Currencies;
 use App\Filament\Resources\Currencies\Pages\CreateCurrency;
 use App\Filament\Resources\Currencies\Pages\EditCurrency;
 use App\Filament\Resources\Currencies\Pages\ListCurrencies;
+use App\Filament\Resources\Currencies\RelationManagers\ExchangeRatesBaseRelationManager;
 use App\Filament\Resources\Currencies\Schemas\CurrencyForm;
 use App\Filament\Resources\Currencies\Tables\CurrenciesTable;
 use App\Models\Currency;
@@ -33,7 +34,7 @@ class CurrencyResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ExchangeRatesBaseRelationManager::class,
         ];
     }
 

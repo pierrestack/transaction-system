@@ -15,4 +15,14 @@ class Currency extends Model
         'name',
         'symbol',
     ];
+
+    public function exchangeRatesBase()
+    {
+        return $this->hasMany(ExchangeRate::class, 'base_currency_id');
+    }
+
+    public function exchangeRatesTarget()
+    {
+        return $this->hasMany(ExchangeRate::class, 'target_currency_id');
+    }
 }
