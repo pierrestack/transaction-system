@@ -26,4 +26,14 @@ class Account extends Model
     {
         return $this->belongsTo(Currency::class);
     }
+
+    public function sentTransfers()
+    {
+        return $this->hasMany(Transfer::class, 'sender_account_id');
+    }
+
+    public function receivedTransfers()
+    {
+        return $this->hasMany(Transfer::class, 'receiver_account_id');
+    }
 }

@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Transfer extends Model
+{
+    /** @use HasFactory<\Database\Factories\TransfertFactory> */
+    use HasFactory;
+
+    protected $fillable = [
+        'token',
+        'reference',
+        'sender_account_id',
+        'receiver_account_id',
+        'amount',
+        'currency_id',
+        'type',
+        'status',
+        'description',
+    ];
+
+    public function senderAccount()
+    {
+        return $this->belongsTo(Account::class, 'sender_account_id');
+    }
+
+    public function receiverAccount()
+    {
+        return $this->belongsTo(Account::class, 'receiver_account_id');
+    }
+}
