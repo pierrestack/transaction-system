@@ -15,14 +15,20 @@ return new class extends Migration
             $table->id();
             $table->string('token')->unique();
             $table->string('reference')->unique();
-            $table->foreignId('sender_account_id')->constrained('accounts')->nullable();
-            $table->foreignId('receiver_account_id')->constrained('accounts')->nullable();
+            $table->foreignId('sender_account_id')->nullable()->constrained('accounts')->nullOnDelete();
+            $table->foreignId('receiver_account_id')->nullable()->constrained('accounts')->nullOnDelete();
             $table->decimal('amount', 15, 2);
             $table->foreignId('currency_id')->constrained('currencies');
             $table->enum('type', ['deposit', 'withdrawal', 'transfer'])->default('transfer');
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->text('description')->nullable();
             $table->timestamps();
+
+            // Index
+            $table->index('sender_account_id');
+            $table->index('receiver_account_id');
+            $table->index('status');
+            $table->index('type');
         });
     }
 
