@@ -5,7 +5,7 @@ namespace App\Filament\Resources\Accounts;
 use App\Filament\Resources\Accounts\Pages\CreateAccount;
 use App\Filament\Resources\Accounts\Pages\EditAccount;
 use App\Filament\Resources\Accounts\Pages\ListAccounts;
-use App\Filament\Resources\Accounts\RelationManagers\SentTransfersRelationManager;
+use App\Filament\Resources\Accounts\RelationManagers\OperationsRelationManager;
 use App\Filament\Resources\Accounts\Schemas\AccountForm;
 use App\Filament\Resources\Accounts\Tables\AccountsTable;
 use App\Models\Account;
@@ -34,7 +34,7 @@ class AccountResource extends Resource
     public static function getRelations(): array
     {
         return [
-            SentTransfersRelationManager::class,
+            OperationsRelationManager::class,
         ];
     }
 

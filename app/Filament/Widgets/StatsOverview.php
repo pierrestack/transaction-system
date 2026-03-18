@@ -3,7 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Account;
-use App\Models\Currency;
+use App\Models\Operation;
 use App\Models\Transfer;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -23,8 +23,8 @@ class StatsOverview extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-arrow-path')
                 ->color('warning'),
 
-            Stat::make('Total currencies', Currency::count())
-                ->description('Total number of currencies')
+            Stat::make('Total operations', Operation::count())
+                ->description('Total number of operations')
                 ->descriptionIcon('heroicon-m-arrows-right-left')
                 ->color('info'),
         ];

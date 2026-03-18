@@ -36,4 +36,9 @@ class Account extends Model
     {
         return $this->hasMany(Transfer::class, 'receiver_account_id');
     }
+
+    public function operations()
+    {
+        return $this->hasMany(Operation::class);
+    }
 }

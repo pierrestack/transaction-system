@@ -18,4 +18,14 @@ class Operation extends Model
         'balance_before',
         'balance_after'
     ];
+
+    public function transfer()
+    {
+        return $this->belongsTo(Transfer::class);
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(Account::class);
+    }
 }
