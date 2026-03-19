@@ -29,6 +29,9 @@ class AccountForm
                 TextInput::make('balance')
                     ->required()
                     ->numeric()
+                    ->disabled()
+                    ->dehydrated(true)
+                    ->unique(ignoreRecord: true)
                     ->default(0),
                 Select::make('status')
                     ->required()

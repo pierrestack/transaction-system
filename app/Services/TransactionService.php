@@ -32,4 +32,14 @@ class TransactionService
     {
         return $this->transactionRepository->executeWithdrawal($token);
     }
+
+    public function transfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description)
+    {
+        return $this->transactionRepository->initTransfer($fromAccountNumber, $toAccountNumber, $amount, $description);
+    }
+
+    public function executeTransfer(string $token)
+    {
+        return $this->transactionRepository->executeTransfer($token);
+    }
 }
