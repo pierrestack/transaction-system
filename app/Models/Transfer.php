@@ -22,6 +22,8 @@ class Transfer extends Model
         'type',
         'status',
         'description',
+        'processed_at',
+        'expires_at',
     ];
 
     protected $casts = [

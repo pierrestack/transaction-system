@@ -21,9 +21,11 @@ class TransferFactory
             'sender_account_id' => $senderId,
             'receiver_account_id' => $receiverId,
             'amount' => $amount,
-            'status' => 'completed',
+            'status' => 'pending',
             'currency_id' => $currencyId,
             'description' => $description,
+            'processed_at' => null,
+            'expires_at' => now()->addMinute(10),
         ];
     }
 }

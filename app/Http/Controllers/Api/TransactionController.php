@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\DepositRequest;
+use App\Http\Requests\InitDepositRequest;
 use App\Services\TransactionService;
 
 class TransactionController extends Controller
@@ -15,18 +16,34 @@ class TransactionController extends Controller
         $this->service = $service;
     }
 
-    public function deposit(DepositRequest $request)
+    public function initDeposit(InitDepositRequest $request)
     {
         $data = $request->validated();
 
-        $result = $this->service->deposit(
-            $data['account_number'],
-            $data['amount'],
-            $data['description']
+        $transfer = $this->service->deposit(
+            $data['account_number'], 
+            $data['amount'], 
+            $data['description'] ?? ''
         );
 
         return response()->json([
-            'message' => 'Deposit successful',
+            'token' => $transfer->token,
+            'reference' => $transfer->reference,
+        ]);
+    }
+
+    public function executeDeposit(DepositRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $result = $this->service->executeDeposit($data['token']);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+        return response()->json([
+            'message' => 'Deposit executed successfully',
             'data' => $result
         ]);
     }

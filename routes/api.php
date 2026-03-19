@@ -7,7 +7,9 @@ Route::prefix('transactions')->group(function () {
 
     Route::controller(TransactionController::class)->group(function () {
 
-        Route::post('/deposit', 'deposit');
+        Route::post('/init-deposit', 'initDeposit');
+
+        Route::post('/execute-deposit', 'executeDeposit');
         
     });
 });

@@ -12,17 +12,11 @@ use Illuminate\Support\Facades\DB;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
-    public function deposit(string $accountNumber, float $amount, string $description)
+    public function initDeposit(string $accountNumber, float $amount, string $description)
     {
         return DB::transaction(function () use ($accountNumber, $amount, $description) {
 
             $account = Account::where('account_number', $accountNumber)->firstOrFail();
-
-            $before = $account->balance;
-
-            $account->increment('balance', $amount);
-
-            $after = $account->balance;
 
             $transfer = Transfer::create(TransferFactory::make(
                 'deposit',
@@ -33,14 +27,47 @@ class TransactionRepository implements TransactionRepositoryInterface
                 $description
             ));
 
+            return $transfer;
+        });
+    }
+
+    public function executeDeposit(string $token)
+    {
+        return DB::transaction(function () use ($token) {
+
+            $transfer = Transfer::where('token', $token)
+                ->lockForUpdate()
+                ->firstOrFail();
+            
+            if ($transfer->expires_at < now()) {
+                throw new \Exception('Token expired');
+            }
+
+            if ($transfer->status->value !== 'pending') {
+                throw new \Exception('Transfer already processed');
+            }
+
+            $account = Account::findOrFail($transfer->receiver_account_id);
+
+            $before = $account->balance;
+
+            $account->increment('balance', $transfer->amount);
+
+            $after = $account->balance;
+
             Operation::create(OperationFactory::make(
                 $account->id,
                 $transfer->id,
                 'credit',
-                $amount,
+                $transfer->amount,
                 $before,
                 $after
             ));
+
+            $transfer->update([
+                'status' => 'completed',
+                'processed_at' => now(),
+            ]);
 
             return $transfer;
         });

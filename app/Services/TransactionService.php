@@ -15,6 +15,11 @@ class TransactionService
 
     public function deposit(string $accountNumber, float $amount, string $description)
     {
-        return $this->transactionRepository->deposit($accountNumber, $amount, $description);
+        return $this->transactionRepository->initDeposit($accountNumber, $amount, $description);
+    }
+
+    public function executeDeposit(string $token)
+    {
+        return $this->transactionRepository->executeDeposit($token);
     }
 }

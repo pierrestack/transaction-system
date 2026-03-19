@@ -22,6 +22,8 @@ return new class extends Migration
             $table->enum('type', ['deposit', 'withdrawal', 'transfer'])->default('transfer');
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->text('description')->nullable();
+            $table->timestamp('processed_at')->nullable();
+            $table->timestamp('expires_at')->nullable();
             $table->timestamps();
 
             // Index
