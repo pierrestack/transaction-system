@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class InitDepositRequest extends FormRequest
+class WithdrawalRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,9 +23,7 @@ class InitDepositRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_number' => 'required|exists:accounts,account_number',
-            'amount' => 'required|numeric|min:0.01',
-            'description' => 'nullable|string|max:255',
+            'token' => 'required|string|exists:transfers,token',
         ];
     }
 }

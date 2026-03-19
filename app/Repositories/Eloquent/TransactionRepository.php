@@ -72,4 +72,69 @@ class TransactionRepository implements TransactionRepositoryInterface
             return $transfer;
         });
     }
+    
+    public function initWithdrawal(string $accountNumber, float $amount, string $description)
+    {
+        return DB::transaction(function () use ($accountNumber, $amount, $description) {
+
+            $account = Account::where('account_number', $accountNumber)->firstOrFail();
+
+            if ($account->balance < $amount) {
+                throw new \Exception('Insufficient balance');
+            }
+
+            $transfer = Transfer::create(TransferFactory::make(
+                'withdrawal',
+                $account->id,
+                null,
+                $amount,
+                $account->currency_id,
+                $description
+            ));
+
+            return $transfer;
+        });
+    }
+
+    public function executeWithdrawal(string $token)
+    {
+        return DB::transaction(function () use ($token) {
+
+            $transfer = Transfer::where('token', $token)
+                ->lockForUpdate()
+                ->firstOrFail();
+            
+            if ($transfer->expires_at < now()) {
+                throw new \Exception('Token expired');
+            }
+
+            if ($transfer->status->value !== 'pending') {
+                throw new \Exception('Transfer already processed');
+            }
+
+            $account = Account::findOrFail($transfer->sender_account_id);
+
+            $before = $account->balance;
+
+            $account->decrement('balance', $transfer->amount);
+
+            $after = $account->balance;
+
+            Operation::create(OperationFactory::make(
+                $account->id,
+                $transfer->id,
+                'debit',
+                $transfer->amount,
+                $before,
+                $after
+            ));
+
+            $transfer->update([
+                'status' => 'completed',
+                'processed_at' => now(),
+            ]);
+
+            return $transfer;
+        });
+    }
 }

@@ -22,4 +22,14 @@ class TransactionService
     {
         return $this->transactionRepository->executeDeposit($token);
     }
+
+    public function withdrawal(string $accountNumber, float $amount, string $description)
+    {
+        return $this->transactionRepository->initWithdrawal($accountNumber, $amount, $description);
+    }
+
+    public function executeWithdrawal(string $token)
+    {
+        return $this->transactionRepository->executeWithdrawal($token);
+    }
 }

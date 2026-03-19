@@ -10,6 +10,10 @@ Route::prefix('transactions')->group(function () {
         Route::post('/init-deposit', 'initDeposit');
 
         Route::post('/execute-deposit', 'executeDeposit');
+
+        Route::post('/init-withdrawal', 'initWithdrawal');
+
+        Route::post('/execute-withdrawal', 'executeWithdrawal');
         
     });
 });

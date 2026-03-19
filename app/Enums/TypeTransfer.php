@@ -12,13 +12,13 @@ use Illuminate\Contracts\Support\Htmlable;
 enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
 {
     case DEPOSIT = 'deposit';
-    case WITHDRAW = 'withdraw';
+    case WITHDRAWAL = 'withdrawal';
 
     public function getLabel(): string|Htmlable|null
     {
         return match ($this) {
             self::DEPOSIT => 'Deposit',
-            self::WITHDRAW => 'Withdraw',
+            self::WITHDRAWAL => 'Withdrawal',
         };
     }
 
@@ -26,7 +26,7 @@ enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
     {
         return match ($this) {
             self::DEPOSIT => 'success',
-            self::WITHDRAW => 'danger',
+            self::WITHDRAWAL => 'danger',
         };
     }
 
@@ -34,7 +34,7 @@ enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
     {
         return match ($this) {
             self::DEPOSIT => Heroicon::ArrowUpCircle,
-            self::WITHDRAW => Heroicon::ArrowDownCircle,
+            self::WITHDRAWAL => Heroicon::ArrowDownCircle,
         };
     }
 }
