@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\StatusTransfer;
+use App\Enums\TypeTransfer;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,6 +24,12 @@ class Transfer extends Model
         'description',
     ];
 
+    protected $casts = [
+        'amount' => 'float',
+        'type' => TypeTransfer::class,
+        'status' => StatusTransfer::class,
+    ];
+
     public function senderAccount()
     {
         return $this->belongsTo(Account::class, 'sender_account_id');
@@ -30,5 +38,10 @@ class Transfer extends Model
     public function receiverAccount()
     {
         return $this->belongsTo(Account::class, 'receiver_account_id');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class);
     }
 }
