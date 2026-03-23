@@ -1,23 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('transactions')->group(function () {
 
-    Route::controller(TransactionController::class)->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
-        Route::post('/init-deposit', 'initDeposit');
+    require __DIR__.'/transactions.php';
 
-        Route::post('/execute-deposit', 'executeDeposit');
-
-        Route::post('/init-withdrawal', 'initWithdrawal');
-
-        Route::post('/execute-withdrawal', 'executeWithdrawal');
-
-        Route::post('/init-transfer', 'initTransfer');
-
-        Route::post('/execute-transfer', 'executeTransfer');
-        
-    });
 });
+
+require __DIR__.'/auth.php';
