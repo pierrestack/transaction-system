@@ -137,4 +137,89 @@ class TransactionRepository implements TransactionRepositoryInterface
             return $transfer;
         });
     }
+
+    public function initTransfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description)
+    {
+        return DB::transaction(function () use ($fromAccountNumber, $toAccountNumber, $amount, $description) {
+
+            $fromAccount = Account::where('account_number', $fromAccountNumber)->firstOrFail();
+            $toAccount = Account::where('account_number', $toAccountNumber)->firstOrFail();
+
+            if ($fromAccount->balance < $amount) {
+                throw new \Exception('Insufficient balance');
+            }
+
+            $transfer = Transfer::create(TransferFactory::make(
+                'transfer',
+                $fromAccount->id,
+                $toAccount->id,
+                $amount,
+                $fromAccount->currency_id,
+                $description
+            ));
+
+            return $transfer;
+        });
+    }
+
+    public function executeTransfer(string $token)
+    {
+        return DB::transaction(function () use ($token) {
+
+            $transfer = Transfer::where('token', $token)
+                ->lockForUpdate()
+                ->firstOrFail();
+            
+            if ($transfer->expires_at < now()) {
+                throw new \Exception('Token expired');
+            }
+
+            if ($transfer->status->value !== 'pending') {
+                throw new \Exception('Transfer already processed');
+            }
+
+            $fromAccount = Account::findOrFail($transfer->sender_account_id);
+            $toAccount = Account::findOrFail($transfer->receiver_account_id);
+
+            if ($fromAccount->balance < $transfer->amount) {
+                throw new \Exception('Insufficient balance');
+            }
+
+            // Debit from account
+            $beforeFrom = $fromAccount->balance;
+            $fromAccount->decrement('balance', $transfer->amount);
+            $afterFrom = $fromAccount->balance;
+
+            Operation::create(OperationFactory::make(
+                $fromAccount->id,
+                $transfer->id,
+                'debit',
+                $transfer->amount,
+                $beforeFrom,
+                $afterFrom
+            ));
+
+            // Credit to account
+            $beforeTo = $toAccount->balance;
+            $toAccount->increment('balance', $transfer->amount);
+            $afterTo = $toAccount->balance;
+
+            Operation::create(OperationFactory::make(
+                $toAccount->id,
+                $transfer->id,
+                'credit',
+                $transfer->amount,
+                $beforeTo,
+                $afterTo
+            ));
+
+            // Update transfer status
+            $transfer->update([
+                'status' => 'completed',
+                'processed_at' => now(),
+            ]);
+
+            return $transfer;
+        });
+    }
 }

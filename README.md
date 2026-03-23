@@ -1,59 +1,230 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📦 Transaction Management API (Deposit, Withdrawal, Transfer)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 📖 Description
 
-## About Laravel
+This API provides a robust system for handling financial transactions, including:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+* 💰 **Deposit**
+* 💸 **Withdrawal**
+* 🔁 **Transfer between accounts**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The architecture follows a **two-step transaction pattern** inspired by fintech systems:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* **INIT** → initialize a transaction and generate a token
+* **EXECUTE** → securely process the transaction
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## 🧠 Core Concepts
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 🔐 Transaction Token
 
-## Laravel Sponsors
+Each transaction is initialized with a **unique token**, ensuring:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+* Idempotency (prevents duplicate execution)
+* Traceability
+* Security
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🔄 INIT / EXECUTE Pattern
 
-## Contributing
+| Step    | Description                                  |
+| ------- | -------------------------------------------- |
+| INIT    | Creates a transaction with `pending` status  |
+| EXECUTE | Applies the transaction and updates balances |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### 📊 Ledger System (Operations)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Each transaction generates accounting entries:
 
-## Security Vulnerabilities
+* `credit` → adds funds
+* `debit` → removes funds
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+## 🚀 Technologies
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+* Laravel (Backend API)
+* Laravel Sanctum (Authentication)
+* MySQL / PostgreSQL
+* Filament (Admin Panel)
+* Eloquent ORM
+* Database Transactions (`DB::transaction`)
+
+---
+
+## 📂 Project Structure
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   ├── Requests/
+│   ├── Responses/
+├── Models/
+├── Services/
+├── Factories/
+```
+
+---
+
+## 🔌 API Endpoints
+
+### 🔹 Deposit
+
+**INIT**
+
+```
+POST /api/transactions/init-deposit
+```
+
+**EXECUTE**
+
+```
+POST /api/transactions/execute-deposit
+```
+
+---
+
+### 🔹 Withdrawal
+
+**INIT**
+
+```
+POST /api/transactions/init-withdrawal
+```
+
+**EXECUTE**
+
+```
+POST /api/transactions/execute-withdrawal
+```
+
+---
+
+### 🔹 Transfer
+
+**INIT**
+
+```
+POST /api/transactions/init-transfer
+```
+
+**EXECUTE**
+
+```
+POST /api/transactions/execute-transfer
+```
+
+---
+
+## 📥 Example API Response
+
+```json
+{
+  "status": "success",
+  "message": "Transfer initialized",
+  "data": {
+    "token": "uuid...",
+    "reference": "TRF-XXXXX"
+  }
+}
+```
+
+---
+
+## ⚙️ Business Logic
+
+### ✔️ INIT Phase
+
+* Generates a unique token
+* Creates a `pending` transaction
+* Does not modify balances
+
+---
+
+### ✔️ EXECUTE Phase
+
+* Validates token
+* Ensures transaction is `pending`
+* Checks account balance (for withdrawal/transfer)
+* Uses `lockForUpdate()` to prevent race conditions
+* Updates account balances
+* Creates ledger entries (operations)
+* Marks transaction as `completed`
+
+---
+
+## 🔒 Security
+
+* Database transactions (`DB::transaction`)
+* Pessimistic locking (`lockForUpdate`)
+* Request validation via FormRequest
+* Idempotency via token
+* Transaction status verification
+
+---
+
+## 🧪 Validation
+
+Each endpoint uses dedicated **Form Requests** to validate:
+
+* Account IDs
+* Amount values
+* Business rules (e.g., sufficient balance)
+
+---
+
+## 🧱 Architecture
+
+* **Service Layer** → handles business logic (TransactionService)
+* **Factory Pattern** → creates operations (ledger entries)
+* **Response Classes** → standardizes API responses
+* Clean separation of concerns
+
+---
+
+## 🖥️ Admin Panel
+
+Built with Filament, providing:
+
+* Account management
+* Transaction monitoring
+* Multi-tab transaction forms (Deposit / Withdrawal / Transfer)
+
+---
+
+## 🧑‍💻 Installation
+
+```
+git clone https://github.com/pierrestack/transaction-system.git
+cd transaction-system
+
+composer install
+npm install && npm run build
+cp .env.example .env
+
+php artisan key:generate
+php artisan migrate
+
+php artisan serve
+```
+
+---
+
+## 📌 Best Practices Applied
+
+* Clean Architecture
+* SOLID principles
+* DRY (Don't Repeat Yourself)
+* RESTful API standards
+* INIT / EXECUTE transaction pattern
+
+---
+
+## 📞 Contact
+
+This project was developed as part of an advanced exploration of API architecture and financial transaction systems.
