@@ -2,14 +2,9 @@
 
 namespace App\Filament\Resources\Accounts\RelationManagers;
 
-use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -40,9 +35,6 @@ class OperationsRelationManager extends RelationManager
                 $query->orderBy('created_at', 'desc')
             )
             ->columns([
-                // TextColumn::make('account.account_number')
-                //     ->label('Account number')
-                //     ->searchable(),
                 TextColumn::make('type')
                     ->searchable()
                     ->formatStateUsing(fn (string $state) => ucfirst($state)),
@@ -64,13 +56,10 @@ class OperationsRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // CreateAction::make(),
-                // AssociateAction::make(),
+                //
             ])
             ->recordActions([
-                // EditAction::make(),
-                // DissociateAction::make(),
-                DeleteAction::make(),
+                //
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

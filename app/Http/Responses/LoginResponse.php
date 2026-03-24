@@ -2,25 +2,13 @@
 
 namespace App\Http\Responses;
 
-use Illuminate\Contracts\Support\Responsable;
-
-class LoginResponse implements Responsable
+class LoginResponse extends BaseResponse
 {
-    protected $token;
-    protected $tokenType;
-
     public function __construct($token, $tokenType = 'Bearer')
     {
-        $this->token = $token;
-        $this->tokenType = $tokenType;
-    }
-
-    public function toResponse($request)
-    {
-        return response()->json([
-            'access_token' => $this->token,
-            'token_type' => $this->tokenType,
+        parent::__construct(200, 'Login successful', [
+            'access_token' => $token,
+            'token_type' => $tokenType,
         ]);
     }
-
 }
