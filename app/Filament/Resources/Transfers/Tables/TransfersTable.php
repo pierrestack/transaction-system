@@ -38,6 +38,11 @@ class TransfersTable
                     ->badge()
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('fee.amount')
+                    ->label('fee')
+                    ->numeric()
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' '). ' '. $record->currency->symbol)
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -2,16 +2,27 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Enums\TypeFee;
+use App\Factories\FreeFactory;
 use App\Factories\OperationFactory;
 use App\Factories\TransferFactory;
 use App\Models\Account;
+use App\Models\Fee;
 use App\Models\Operation;
 use App\Models\Transfer;
 use App\Repositories\Contracts\TransactionRepositoryInterface;
+use App\Services\Contracts\FeeCalculatorInterface;
 use Illuminate\Support\Facades\DB;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
+    private FeeCalculatorInterface $feeCalculatorInterface;
+
+    public function __construct(FeeCalculatorInterface $feeCalculatorInterface)
+    {
+        $this->feeCalculatorInterface = $feeCalculatorInterface;
+    }
+
     public function initDeposit(string $accountNumber, float $amount, string $description)
     {
         return DB::transaction(function () use ($accountNumber, $amount, $description) {
@@ -68,6 +79,11 @@ class TransactionRepository implements TransactionRepositoryInterface
                 'status' => 'completed',
                 'processed_at' => now(),
             ]);
+
+            Fee::create(FreeFactory::make(
+                $transfer->id,
+                strtolower(TypeFee::FREE_CHARGED->getLabel()),
+            ));
 
             return $transfer;
         });
@@ -133,6 +149,11 @@ class TransactionRepository implements TransactionRepositoryInterface
                 'status' => 'completed',
                 'processed_at' => now(),
             ]);
+
+            Fee::create(FreeFactory::make(
+                $transfer->id,
+                strtolower(TypeFee::FREE_CHARGED->getLabel()),
+            ));
 
             return $transfer;
         });
@@ -218,6 +239,12 @@ class TransactionRepository implements TransactionRepositoryInterface
                 'status' => 'completed',
                 'processed_at' => now(),
             ]);
+
+            Fee::create(FreeFactory::make(
+                $transfer->id,
+                strtolower(TypeFee::FEE_CHARGED->getLabel()),
+                $this->feeCalculatorInterface->calculate($transfer),
+            ));
 
             return $transfer;
         });
