@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('account_number')->unique();
             $table->decimal('balance', 15, 2)->default(0);
+            $table->enum('type', ['user', 'system'])->default('user');
+            $table->string('system_name')->nullable();
             $table->foreignId('currency_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['active', 'suspended', 'closed'])->default('active');
             $table->timestamps();

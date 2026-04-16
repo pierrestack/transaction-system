@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TypeOperation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,6 +18,10 @@ class Operation extends Model
         'amount',
         'balance_before',
         'balance_after'
+    ];
+
+    protected $casts = [
+        'type' => TypeOperation::class,
     ];
 
     public function transfer()

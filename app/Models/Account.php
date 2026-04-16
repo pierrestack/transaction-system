@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\StatusAccount;
+use App\Enums\TypeAccount;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,10 +17,13 @@ class Account extends Model
         'balance',
         'currency_id',
         'status',
+        'type',
+        'system_name'
     ];
 
     protected $casts = [
         'status' => StatusAccount::class,
+        'type' => TypeAccount::class,
     ];
 
     public function currency()
