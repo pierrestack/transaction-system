@@ -46,4 +46,9 @@ class Transfer extends Model
     {
         return $this->belongsTo(Currency::class);
     }
+
+    public function fee()
+    {
+        return $this->hasOne(Fee::class);
+    }
 }

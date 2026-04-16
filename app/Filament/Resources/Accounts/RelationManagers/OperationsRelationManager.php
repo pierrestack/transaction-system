@@ -37,7 +37,8 @@ class OperationsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('type')
                     ->searchable()
-                    ->formatStateUsing(fn (string $state) => ucfirst($state)),
+                    ->sortable()
+                    ->badge(),
                 TextColumn::make('amount')
                     ->numeric()
                     ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->account->currency->symbol),

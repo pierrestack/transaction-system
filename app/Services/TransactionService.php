@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\TransactionRepositoryInterface;
+use App\Services\Fee\FeeCalculatorService;
 
 class TransactionService
 {
     protected TransactionRepositoryInterface $transactionRepository;
     
-    public function __construct(TransactionRepositoryInterface $transactionRepository)
+    public function __construct(TransactionRepositoryInterface $transactionRepository, FeeCalculatorService $feeCalculatorService)
     {
         $this->transactionRepository = $transactionRepository;
     }

@@ -2,35 +2,28 @@
 
 namespace App\Models;
 
-use App\Enums\TypeOperation;
+use App\Enums\TypeFee;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Operation extends Model
+class Fee extends Model
 {
-    /** @use HasFactory<\Database\Factories\OperationFactory> */
+    /** @use HasFactory<\Database\Factories\FeeFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'account_id',
         'transfer_id',
         'type',
         'amount',
-        'balance_before',
-        'balance_after'
     ];
 
     protected $casts = [
-        'type' => TypeOperation::class,
+        'type' => TypeFee::class,
+        'amount' => 'decimal:2',
     ];
 
     public function transfer()
     {
         return $this->belongsTo(Transfer::class);
-    }
-
-    public function account()
-    {
-        return $this->belongsTo(Account::class);
     }
 }
