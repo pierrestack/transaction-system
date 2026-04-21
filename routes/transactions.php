@@ -18,5 +18,9 @@ Route::prefix('transactions')->group(function () {
         Route::post('/init-transfer', 'initTransfer');
 
         Route::post('/execute-transfer', 'executeTransfer');
+
+        Route::post('/init-multi-transfer', 'initMultiTransfer');
+
+        Route::post('/execute-multi-transfer', 'executeMultiTransfer');
     });
 });
