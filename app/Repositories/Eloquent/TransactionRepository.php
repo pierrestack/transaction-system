@@ -179,7 +179,7 @@ class TransactionRepository implements TransactionRepositoryInterface
                 $description
             );
 
-            $fee = $this->feeCalculatorInterface->calculate(new Transfer($transferFactory));
+            $fee = $this->feeCalculatorInterface->calculateFeeForTransfer(new Transfer($transferFactory));
 
             if ($fromAccount->balance < $amount + $fee) {
                 throw new \Exception('Insufficient balance');
@@ -199,7 +199,7 @@ class TransactionRepository implements TransactionRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
             
-            $fee = $this->feeCalculatorInterface->calculate($transfer);
+            $fee = $this->feeCalculatorInterface->calculateFeeForTransfer($transfer);
             
             if ($transfer->expires_at < now()) {
                 throw new \Exception('Token expired');
@@ -248,14 +248,26 @@ class TransactionRepository implements TransactionRepositoryInterface
 
             $systemAccount = Account::where('currency_id', $transfer->currency_id)
                 ->where('type', TypeAccount::SYSTEM)
+                ->lockForUpdate()
                 ->firstOrFail();
-            
+
+            $beforeSystem = $systemAccount->balance;
             $systemAccount->increment('balance', $fee);
+            $afterSystem = $systemAccount->balance;
 
             Fee::create(FreeFactory::make(
                 $transfer->id,
                 TypeFee::FEE_CHARGED->value,
                 $fee
+            ));
+
+            Operation::create(OperationFactory::make(
+                $systemAccount->id,
+                $transfer->id,
+                TypeOperation::CREDIT->value,
+                $fee,
+                $beforeSystem,
+                $afterSystem
             ));
 
             return $transfer;

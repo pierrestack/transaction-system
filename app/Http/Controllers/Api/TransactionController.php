@@ -4,12 +4,16 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\InitDepositRequest;
+use App\Http\Requests\InitMultiTransferRequest;
 use App\Http\Requests\InitTransferRequest;
 use App\Http\Requests\InitWithdrawalRequest;
+use App\Http\Requests\MultiTransferRequest;
 use App\Http\Requests\TransactionRequest;
 use App\Http\Responses\ErrorTransactionResponse;
+use App\Http\Responses\ExecuteMultiTransferResponse;
 use App\Http\Responses\ExecuteTransactionResponse;
 use App\Http\Responses\InitTransactionResponse;
+use App\Http\Responses\InitMultiTransferResponse;
 use App\Services\TransactionService;
 
 class TransactionController extends Controller
@@ -98,5 +102,30 @@ class TransactionController extends Controller
             return new ErrorTransactionResponse($e->getMessage());
         }
         return new ExecuteTransactionResponse($result);
+    }
+
+    public function initMultiTransfer(InitMultiTransferRequest $request)
+    {
+        $data = $request->validated();
+        try {
+             $transfers = $this->service->multiTransfer(
+                $data['transfers'], 
+                $data['description'] ?? ''
+            );
+        } catch (\Exception $e) {
+            return new ErrorTransactionResponse($e->getMessage());
+        }
+        return new InitMultiTransferResponse($transfers);
+    }
+
+    public function executeMultiTransfer(MultiTransferRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $result = $this->service->executeMultiTransfer($data['tokens']);
+        } catch (\Exception $e) {
+            return new ErrorTransactionResponse($e->getMessage());
+        }
+        return new ExecuteMultiTransferResponse($result);
     }
 }
