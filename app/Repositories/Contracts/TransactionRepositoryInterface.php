@@ -10,4 +10,6 @@ interface TransactionRepositoryInterface
     public function executeWithdrawal(string $token);
     public function initTransfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description);
     public function executeTransfer(string $token);
+    public function initMultiTransfer(array $transfers, string $description);
+    public function executeMultiTransfer(array $token);
 }

@@ -3,17 +3,14 @@
 namespace App\Services;
 
 use App\Repositories\Contracts\TransactionRepositoryInterface;
-use App\Repositories\Eloquent\AdvancedTransactionRepository;
 
 class TransactionService
 {
     protected TransactionRepositoryInterface $transactionRepository;
-    protected AdvancedTransactionRepository $advancedTransactionRepository;
-    
-    public function __construct(TransactionRepositoryInterface $transactionRepository, AdvancedTransactionRepository $advancedTransactionRepository)
+
+    public function __construct(TransactionRepositoryInterface $transactionRepository)
     {
         $this->transactionRepository = $transactionRepository;
-        $this->advancedTransactionRepository = $advancedTransactionRepository;
     }
 
     public function deposit(string $accountNumber, float $amount, string $description)
@@ -48,11 +45,11 @@ class TransactionService
 
     public function multiTransfer(array $transfers, string $description)
     {
-        return $this->advancedTransactionRepository->initMultiTransfer($transfers, $description);
+        return $this->transactionRepository->initMultiTransfer($transfers, $description);
     }
 
     public function executeMultiTransfer(array $tokens)
     {
-        return $this->advancedTransactionRepository->executeMultiTransfer($tokens);
+        return $this->transactionRepository->executeMultiTransfer($tokens);
     }
 }
