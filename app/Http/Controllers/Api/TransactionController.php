@@ -29,11 +29,7 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-            $transfer = $this->service->deposit(
-                $data['account_number'], 
-                $data['amount'], 
-                $data['description'] ?? ''
-            );
+            $transfer = $this->service->deposit($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
@@ -55,11 +51,7 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-             $transfer = $this->service->withdrawal(
-                $data['account_number'], 
-                $data['amount'], 
-                $data['description'] ?? ''
-            );
+             $transfer = $this->service->withdrawal($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
@@ -77,23 +69,18 @@ class TransactionController extends Controller
         return new ExecuteTransactionResponse($result);
     }
 
-    public function initTransfer(InitTransferRequest $request)
+    public function initMonoTransfer(InitTransferRequest $request)
     {
         $data = $request->validated();
         try {
-             $transfer = $this->service->transfer(
-                $data['from_account_number'], 
-                $data['to_account_number'], 
-                $data['amount'], 
-                $data['description'] ?? ''
-            );
+             $transfer = $this->service->monoTransfer($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
         return new InitTransactionResponse($transfer);
     }
 
-    public function executeTransfer(TransactionRequest $request)
+    public function executeMonoTransfer(TransactionRequest $request)
     {
         $data = $request->validated();
         try {
@@ -108,10 +95,7 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-             $transfers = $this->service->multiTransfer(
-                $data['transfers'], 
-                $data['description'] ?? ''
-            );
+             $transfers = $this->service->multiTransfer($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }

@@ -15,9 +15,9 @@ Route::prefix('transactions')->group(function () {
 
         Route::post('/execute-withdrawal', 'executeWithdrawal');
 
-        Route::post('/init-transfer', 'initTransfer');
+        Route::post('/init-transfer', 'initMonoTransfer');
 
-        Route::post('/execute-transfer', 'executeTransfer');
+        Route::post('/execute-transfer', 'executeMonoTransfer');
 
         Route::post('/init-multi-transfer', 'initMultiTransfer');
 
