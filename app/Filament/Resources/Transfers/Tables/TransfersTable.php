@@ -42,7 +42,8 @@ class TransfersTable
                     ->label('fee')
                     ->numeric()
                     ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' '). ' '. $record->currency->symbol)
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -55,9 +56,9 @@ class TransfersTable
                 // EditAction::make(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+//                BulkActionGroup::make([
+//                    DeleteBulkAction::make(),
+//                ]),
             ]);
     }
 }

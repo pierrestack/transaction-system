@@ -2,32 +2,34 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Enums\StatusTransfer;
-use App\Enums\TypeAccount;
 use App\Enums\TypeFee;
-use App\Enums\TypeOperation;
 use App\Enums\TypeTransfer;
 use App\Factories\FreeFactory;
-use App\Factories\OperationFactory;
 use App\Factories\TransferFactory;
 use App\Models\Account;
 use App\Models\Fee;
-use App\Models\Operation;
 use App\Models\Transfer;
 use App\Repositories\Contracts\TransactionRepositoryInterface;
 use App\Services\Contracts\FeeCalculatorInterface;
+use App\Services\OperationService;
+use App\Services\Validator\TransferValidator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
-class TransactionRepository implements TransactionRepositoryInterface
+abstract class TransactionRepository implements TransactionRepositoryInterface
 {
-    private FeeCalculatorInterface $feeCalculatorInterface;
+    protected FeeCalculatorInterface $feeCalculatorInterface;
+    protected OperationService $operationService;
+    protected TransferValidator $transferValidator;
 
-    public function __construct(FeeCalculatorInterface $feeCalculatorInterface)
+    public function __construct(FeeCalculatorInterface $feeCalculatorInterface, OperationService $operationService, TransferValidator $transferValidator)
     {
         $this->feeCalculatorInterface = $feeCalculatorInterface;
+        $this->operationService = $operationService;
+        $this->transferValidator = $transferValidator;
     }
 
-    public function initDeposit(string $accountNumber, float $amount, string $description)
+    public function initDeposit(string $accountNumber, float $amount, string $description): Transfer
     {
         return DB::transaction(function () use ($accountNumber, $amount, $description) {
 
@@ -46,54 +48,28 @@ class TransactionRepository implements TransactionRepositoryInterface
         });
     }
 
-    public function executeDeposit(string $token)
+    public function executeDeposit(Transfer $transfer): Transfer
     {
-        return DB::transaction(function () use ($token) {
+        return DB::transaction(function () use ($transfer) {
 
-            $transfer = Transfer::where('token', $token)
-                ->lockForUpdate()
-                ->firstOrFail();
-            
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
-            }
-
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
-            }
+            $this->transferValidator->validate($transfer);
 
             $account = Account::findOrFail($transfer->receiver_account_id);
 
-            $before = $account->balance;
-
-            $account->increment('balance', $transfer->amount);
-
-            $after = $account->balance;
-
-            Operation::create(OperationFactory::make(
-                $account->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $transfer->amount,
-                $before,
-                $after
-            ));
-
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
+            $this->operationService->credit($account, $transfer->id, $transfer->amount);
 
             Fee::create(FreeFactory::make(
                 $transfer->id,
                 TypeFee::FREE_CHARGED->value,
             ));
 
+            $transfer->markCompleted();
+
             return $transfer;
         });
     }
-    
-    public function initWithdrawal(string $accountNumber, float $amount, string $description)
+
+    public function initWithdrawal(string $accountNumber, float $amount, string $description): Transfer
     {
         return DB::transaction(function () use ($accountNumber, $amount, $description) {
 
@@ -116,54 +92,28 @@ class TransactionRepository implements TransactionRepositoryInterface
         });
     }
 
-    public function executeWithdrawal(string $token)
+    public function executeWithdrawal(Transfer $transfer): Transfer
     {
-        return DB::transaction(function () use ($token) {
+        return DB::transaction(function () use ($transfer) {
 
-            $transfer = Transfer::where('token', $token)
-                ->lockForUpdate()
-                ->firstOrFail();
-            
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
-            }
-
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
-            }
+            $this->transferValidator->validate($transfer);
 
             $account = Account::findOrFail($transfer->sender_account_id);
 
-            $before = $account->balance;
-
-            $account->decrement('balance', $transfer->amount);
-
-            $after = $account->balance;
-
-            Operation::create(OperationFactory::make(
-                $account->id,
-                $transfer->id,
-                TypeOperation::DEBIT->value,
-                $transfer->amount,
-                $before,
-                $after
-            ));
-
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
+            $this->operationService->debit($account, $transfer->id, $transfer->amount);
 
             Fee::create(FreeFactory::make(
                 $transfer->id,
                 TypeFee::FREE_CHARGED->value,
             ));
 
+            $transfer->markCompleted();
+
             return $transfer;
         });
     }
 
-    public function initTransfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description)
+    public function initMonoTransfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description): Transfer
     {
         return DB::transaction(function () use ($fromAccountNumber, $toAccountNumber, $amount, $description) {
 
@@ -191,86 +141,39 @@ class TransactionRepository implements TransactionRepositoryInterface
         });
     }
 
-    public function executeTransfer(string $token)
+    public abstract function executeMonoTransfer(Transfer $transfer): Transfer;
+
+    public function initMultiTransfer(array $transfers, string $description): Collection
     {
-        return DB::transaction(function () use ($token) {
+        return DB::transaction(function () use ($transfers, $description) {
 
-            $transfer = Transfer::where('token', $token)
-                ->lockForUpdate()
-                ->firstOrFail();
-            
-            $fee = $this->feeCalculatorInterface->calculateFeeForTransfer($transfer);
-            
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
+            $sumAmount = $this->feeCalculatorInterface->calculateSumAmountForTransfer($transfers);
+            $sumFee = $this->feeCalculatorInterface->calculateSumFeeForTransfer($transfers);
+
+            $fromAccount = Account::where('account_number', $transfers[0]['from_account_number'])->firstOrFail();
+            $toAccountNumbers = array_column($transfers, 'to_account_number');
+            $toAccounts = Account::whereIn('account_number', $toAccountNumbers)->get()->keyBy('account_number');
+
+            if ($fromAccount->balance < $sumAmount + $sumFee) {
+                throw new \Exception('Insufficient balance for multi-transfer');
             }
 
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
+            foreach ($transfers as $transfer) {
+                $transferFactory = TransferFactory::make(
+                    TypeTransfer::TRANSFER->value,
+                    $fromAccount->id,
+                    $toAccounts->get($transfer['to_account_number'])->id,
+                    $transfer['amount'],
+                    $fromAccount->currency_id,
+                    $description
+                );
+
+                $transfersList[] = Transfer::create($transferFactory);
             }
 
-            $fromAccount = Account::findOrFail($transfer->sender_account_id);
-            $toAccount = Account::findOrFail($transfer->receiver_account_id);
-
-            // Debit from account
-            $beforeFrom = $fromAccount->balance;
-            $fromAccount->decrement('balance', $transfer->amount + $fee);
-            $afterFrom = $fromAccount->balance;
-
-            Operation::create(OperationFactory::make(
-                $fromAccount->id,
-                $transfer->id,
-                TypeOperation::DEBIT->value,
-                $transfer->amount + $fee,
-                $beforeFrom,
-                $afterFrom
-            ));
-
-            // Credit to account
-            $beforeTo = $toAccount->balance;
-            $toAccount->increment('balance', $transfer->amount);
-            $afterTo = $toAccount->balance;
-
-            Operation::create(OperationFactory::make(
-                $toAccount->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $transfer->amount,
-                $beforeTo,
-                $afterTo
-            ));
-
-            // Update transfer status
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
-
-            $systemAccount = Account::where('currency_id', $transfer->currency_id)
-                ->where('type', TypeAccount::SYSTEM)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $beforeSystem = $systemAccount->balance;
-            $systemAccount->increment('balance', $fee);
-            $afterSystem = $systemAccount->balance;
-
-            Fee::create(FreeFactory::make(
-                $transfer->id,
-                TypeFee::FEE_CHARGED->value,
-                $fee
-            ));
-
-            Operation::create(OperationFactory::make(
-                $systemAccount->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $fee,
-                $beforeSystem,
-                $afterSystem
-            ));
-
-            return $transfer;
+            return collect($transfersList);
         });
     }
+
+    public abstract function executeMultiTransfer(Collection $transfers): Collection;
 }

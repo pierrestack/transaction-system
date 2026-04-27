@@ -2,57 +2,77 @@
 
 namespace App\Services;
 
-use App\Repositories\Contracts\TransactionRepositoryInterface;
-use App\Repositories\Eloquent\AdvancedTransactionRepository;
+use App\Models\Transfer;
+use App\Resolvers\TransferProcessorResolver;
+use App\Services\TransferProcessor\TransactionProcessor;
+use Illuminate\Support\Facades\DB;
 
 class TransactionService
 {
-    protected TransactionRepositoryInterface $transactionRepository;
-    protected AdvancedTransactionRepository $advancedTransactionRepository;
-    
-    public function __construct(TransactionRepositoryInterface $transactionRepository, AdvancedTransactionRepository $advancedTransactionRepository)
+    private TransactionProcessor $transferProcessor;
+    private TransferProcessorResolver $processorResolver;
+
+    public function __construct(TransactionProcessor $transferProcessor, TransferProcessorResolver $transferProcessorResolver)
     {
-        $this->transactionRepository = $transactionRepository;
-        $this->advancedTransactionRepository = $advancedTransactionRepository;
+        $this->transferProcessor = $transferProcessor;
+        $this->processorResolver = $transferProcessorResolver;
     }
 
-    public function deposit(string $accountNumber, float $amount, string $description)
+    public function deposit(array $data)
     {
-        return $this->transactionRepository->initDeposit($accountNumber, $amount, $description);
+        return $this->transferProcessor->initProcessDeposit($data);
     }
 
     public function executeDeposit(string $token)
     {
-        return $this->transactionRepository->executeDeposit($token);
+        return $this->transferProcessor->processDeposit($token);
     }
 
-    public function withdrawal(string $accountNumber, float $amount, string $description)
+    public function withdrawal(array $data)
     {
-        return $this->transactionRepository->initWithdrawal($accountNumber, $amount, $description);
+        return $this->transferProcessor->initWithdrawal($data);
     }
 
     public function executeWithdrawal(string $token)
     {
-        return $this->transactionRepository->executeWithdrawal($token);
+        return $this->transferProcessor->processWithdrawal($token);
     }
 
-    public function transfer(string $fromAccountNumber, string $toAccountNumber, float $amount, string $description)
+    public function monoTransfer(array $data)
     {
-        return $this->transactionRepository->initTransfer($fromAccountNumber, $toAccountNumber, $amount, $description);
+        return $this->transferProcessor->initMonoTransfer($data);
     }
 
     public function executeTransfer(string $token)
     {
-        return $this->transactionRepository->executeTransfer($token);
+        return DB::transaction(function () use ($token) {
+
+            $transfer = Transfer::where('token', $token)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $processor = $this->processorResolver->resolveMonoTransfer($transfer);
+
+            return $processor->processMonoTransfer($transfer);
+        });
     }
 
-    public function multiTransfer(array $transfers, string $description)
+    public function multiTransfer(array $data)
     {
-        return $this->advancedTransactionRepository->initMultiTransfer($transfers, $description);
+        return $this->transferProcessor->initMultiTransfer($data);
     }
 
     public function executeMultiTransfer(array $tokens)
     {
-        return $this->advancedTransactionRepository->executeMultiTransfer($tokens);
+        return DB::transaction(function () use ($tokens) {
+
+            $transfers = Transfer::whereIn('token', $tokens)
+                ->lockForUpdate()
+                ->get();
+
+            $processor = $this->processorResolver->resolveMultiTransfer($transfers);
+
+            return $processor->processMultiTransfer($transfers);
+        });
     }
 }
