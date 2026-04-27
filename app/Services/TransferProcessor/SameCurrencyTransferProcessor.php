@@ -8,12 +8,9 @@ use Illuminate\Support\Collection;
 
 class SameCurrencyTransferProcessor extends TransactionProcessor
 {
-    private TransactionRepository $transactionRepository;
-
     public function __construct(TransactionRepository $transactionRepository)
     {
         parent::__construct($transactionRepository);
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function supportsMonoTransfers(Transfer $transfer): bool

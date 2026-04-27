@@ -8,12 +8,16 @@ use App\Repositories\Eloquent\CrossTransactionRepository;
 use App\Repositories\Eloquent\SameTransactionRepository;
 use App\Repositories\Eloquent\TransactionRepository;
 use App\Resolvers\TransferProcessorResolver;
+use App\Services\Contracts\ConvertionCurrencyInterface;
 use App\Services\Contracts\FeeCalculatorInterface;
+use App\Services\Currency\ConvertCurrencyService;
 use App\Services\Fee\FeeCalculatorService;
+use App\Services\OperationService;
 use App\Services\TransactionService;
 use App\Services\TransferProcessor\CrossCurrencyTransferProcessor;
 use App\Services\TransferProcessor\SameCurrencyTransferProcessor;
 use App\Services\TransferProcessor\TransactionProcessor;
+use App\Services\Validator\TransferValidator;
 use Illuminate\Support\ServiceProvider;
 
 class TransactionServiceProvider extends ServiceProvider
@@ -24,6 +28,8 @@ class TransactionServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(FeeCalculatorInterface::class, FeeCalculatorService::class);
+
+        $this->app->bind(ConvertionCurrencyInterface::class, ConvertCurrencyService::class);
 
         $this->app->when(SameCurrencyTransferProcessor::class)
             ->needs(TransactionRepository::class)
@@ -41,7 +47,11 @@ class TransactionServiceProvider extends ServiceProvider
         });
 
         $this->app->bind(TransactionRepositoryInterface::class, function ($app) {
-            return new SameTransactionRepository($app->make(FeeCalculatorInterface::class));
+            return new SameTransactionRepository(
+                $app->make(FeeCalculatorInterface::class),
+                $app->make(OperationService::class),
+                $app->make(TransferValidator::class),
+            );
         });
 
         $this->app->when(TransactionController::class)

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\ExchangeRate;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +19,7 @@ class DatabaseSeeder extends Seeder
                 UserSeeder::class,
                 CurrencySeeder::class,
                 AccountSeeder::class,
+                ExchangeRate::class,
             ]);
     }
 }

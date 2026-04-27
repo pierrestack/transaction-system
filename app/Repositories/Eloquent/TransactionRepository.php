@@ -2,29 +2,31 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Enums\StatusTransfer;
 use App\Enums\TypeFee;
-use App\Enums\TypeOperation;
 use App\Enums\TypeTransfer;
 use App\Factories\FreeFactory;
-use App\Factories\OperationFactory;
 use App\Factories\TransferFactory;
 use App\Models\Account;
 use App\Models\Fee;
-use App\Models\Operation;
 use App\Models\Transfer;
 use App\Repositories\Contracts\TransactionRepositoryInterface;
 use App\Services\Contracts\FeeCalculatorInterface;
+use App\Services\OperationService;
+use App\Services\Validator\TransferValidator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 abstract class TransactionRepository implements TransactionRepositoryInterface
 {
     protected FeeCalculatorInterface $feeCalculatorInterface;
+    protected OperationService $operationService;
+    protected TransferValidator $transferValidator;
 
-    public function __construct(FeeCalculatorInterface $feeCalculatorInterface)
+    public function __construct(FeeCalculatorInterface $feeCalculatorInterface, OperationService $operationService, TransferValidator $transferValidator)
     {
         $this->feeCalculatorInterface = $feeCalculatorInterface;
+        $this->operationService = $operationService;
+        $this->transferValidator = $transferValidator;
     }
 
     public function initDeposit(string $accountNumber, float $amount, string $description): Transfer
@@ -50,40 +52,18 @@ abstract class TransactionRepository implements TransactionRepositoryInterface
     {
         return DB::transaction(function () use ($transfer) {
 
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
-            }
-
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
-            }
+            $this->transferValidator->validate($transfer);
 
             $account = Account::findOrFail($transfer->receiver_account_id);
 
-            $before = $account->balance;
-
-            $account->increment('balance', $transfer->amount);
-
-            $after = $account->balance;
-
-            Operation::create(OperationFactory::make(
-                $account->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $transfer->amount,
-                $before,
-                $after
-            ));
-
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
+            $this->operationService->credit($account, $transfer->id, $transfer->amount);
 
             Fee::create(FreeFactory::make(
                 $transfer->id,
                 TypeFee::FREE_CHARGED->value,
             ));
+
+            $transfer->markCompleted();
 
             return $transfer;
         });
@@ -116,40 +96,18 @@ abstract class TransactionRepository implements TransactionRepositoryInterface
     {
         return DB::transaction(function () use ($transfer) {
 
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
-            }
-
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
-            }
+            $this->transferValidator->validate($transfer);
 
             $account = Account::findOrFail($transfer->sender_account_id);
 
-            $before = $account->balance;
-
-            $account->decrement('balance', $transfer->amount);
-
-            $after = $account->balance;
-
-            Operation::create(OperationFactory::make(
-                $account->id,
-                $transfer->id,
-                TypeOperation::DEBIT->value,
-                $transfer->amount,
-                $before,
-                $after
-            ));
-
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
+            $this->operationService->debit($account, $transfer->id, $transfer->amount);
 
             Fee::create(FreeFactory::make(
                 $transfer->id,
                 TypeFee::FREE_CHARGED->value,
             ));
+
+            $transfer->markCompleted();
 
             return $transfer;
         });

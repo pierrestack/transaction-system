@@ -8,12 +8,9 @@ use Illuminate\Support\Collection;
 
 class CrossCurrencyTransferProcessor extends TransactionProcessor
 {
-    private TransactionRepository $transactionRepository;
-
     public function __construct(TransactionRepository $transactionRepository)
     {
         parent::__construct($transactionRepository);
-        $this->transactionRepository = $transactionRepository;
     }
 
     public function supportsMonoTransfers(Transfer $transfer): bool
@@ -28,7 +25,7 @@ class CrossCurrencyTransferProcessor extends TransactionProcessor
 
     public function processMonoTransfer(Transfer $transfer): Transfer
     {
-        // TODO: Implement processMonoTransfer() method.
+        return $this->transactionRepository->executeMonoTransfer($transfer);
     }
 
 

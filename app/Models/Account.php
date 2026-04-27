@@ -45,4 +45,11 @@ class Account extends Model
     {
         return $this->hasMany(Operation::class);
     }
+    public function getSystemAccount()
+    {
+        return Account::where('currency_id', $this->currency_id)
+            ->where('type', TypeAccount::SYSTEM)
+            ->lockForUpdate()
+            ->firstOrFail();
+    }
 }

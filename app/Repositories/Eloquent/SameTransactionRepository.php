@@ -2,25 +2,24 @@
 
 namespace App\Repositories\Eloquent;
 
-use App\Enums\StatusTransfer;
 use App\Enums\TypeAccount;
 use App\Enums\TypeFee;
-use App\Enums\TypeOperation;
 use App\Factories\FreeFactory;
-use App\Factories\OperationFactory;
 use App\Models\Account;
 use App\Models\Fee;
-use App\Models\Operation;
 use App\Models\Transfer;
 use App\Services\Contracts\FeeCalculatorInterface;
+use App\Services\OperationService;
+use App\Services\Validator\TransferValidator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class SameTransactionRepository extends TransactionRepository
 {
-    public function __construct(FeeCalculatorInterface $feeCalculatorInterface)
+
+    public function __construct(FeeCalculatorInterface $feeCalculatorInterface, OperationService $operationService, TransferValidator $transferValidator)
     {
-        parent::__construct($feeCalculatorInterface);
+        parent::__construct($feeCalculatorInterface, $operationService, $transferValidator);
     }
 
     public function executeMonoTransfer(Transfer $transfer): Transfer
@@ -29,74 +28,23 @@ class SameTransactionRepository extends TransactionRepository
 
             $fee = $this->feeCalculatorInterface->calculateFeeForTransfer($transfer);
 
-            if ($transfer->expires_at < now()) {
-                throw new \Exception('Token expired');
-            }
-
-            if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                throw new \Exception('Transfer already processed');
-            }
+            $this->transferValidator->validate($transfer);
 
             $fromAccount = Account::findOrFail($transfer->sender_account_id);
+
             $toAccount = Account::findOrFail($transfer->receiver_account_id);
 
-            // Debit from account
-            $beforeFrom = $fromAccount->balance;
-            $fromAccount->decrement('balance', $transfer->amount + $fee);
-            $afterFrom = $fromAccount->balance;
+            $this->operationService->debit($fromAccount, $transfer->id, $transfer->amount + $fee);
 
-            Operation::create(OperationFactory::make(
-                $fromAccount->id,
-                $transfer->id,
-                TypeOperation::DEBIT->value,
-                $transfer->amount + $fee,
-                $beforeFrom,
-                $afterFrom
-            ));
+            $this->operationService->credit($toAccount, $transfer->id, $transfer->amount);
 
-            // Credit to account
-            $beforeTo = $toAccount->balance;
-            $toAccount->increment('balance', $transfer->amount);
-            $afterTo = $toAccount->balance;
+            $systemAccount = (new Account(['currency_id' => $transfer->currency_id]))->getAccountSystem();
 
-            Operation::create(OperationFactory::make(
-                $toAccount->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $transfer->amount,
-                $beforeTo,
-                $afterTo
-            ));
+            Fee::create(FreeFactory::make($transfer->id, TypeFee::FEE_CHARGED->value, $fee));
 
-            // Update transfer status
-            $transfer->update([
-                'status' => StatusTransfer::COMPLETED->value,
-                'processed_at' => now(),
-            ]);
+            $this->operationService->credit($systemAccount, $transfer->id, $fee);
 
-            $systemAccount = Account::where('currency_id', $transfer->currency_id)
-                ->where('type', TypeAccount::SYSTEM)
-                ->lockForUpdate()
-                ->firstOrFail();
-
-            $beforeSystem = $systemAccount->balance;
-            $systemAccount->increment('balance', $fee);
-            $afterSystem = $systemAccount->balance;
-
-            Fee::create(FreeFactory::make(
-                $transfer->id,
-                TypeFee::FEE_CHARGED->value,
-                $fee
-            ));
-
-            Operation::create(OperationFactory::make(
-                $systemAccount->id,
-                $transfer->id,
-                TypeOperation::CREDIT->value,
-                $fee,
-                $beforeSystem,
-                $afterSystem
-            ));
+            $transfer->markCompleted();
 
             return $transfer;
         });
@@ -114,71 +62,24 @@ class SameTransactionRepository extends TransactionRepository
                 ->firstOrFail();
 
             foreach ($transfers as $transfer) {
-                if ($transfer->expires_at < now()) {
-                    throw new \Exception('Token expired for transfer with id: ' . $transfer->id);
-                }
 
-                if ($transfer->status->value !== StatusTransfer::PENDING->value) {
-                    throw new \Exception('Transfer already processed for transfer with id: ' . $transfer->id);
-                }
+                $this->transferValidator->validate($transfer);
 
                 $fee = $this->feeCalculatorInterface->calculateFeeForTransfer($transfer);
 
                 $fromAccount = $fromAccounts->get($transfer->sender_account_id);
+
                 $toAccount = $toAccounts->get($transfer->receiver_account_id);
 
-                // Debit from account
-                $beforeFrom = $fromAccount->balance;
-                $fromAccount->decrement('balance', $transfer->amount + $fee);
-                $afterFrom = $fromAccount->balance;
+                $this->operationService->debit($fromAccount, $transfer->id, $transfer->amount + $fee);
 
-                Operation::create(OperationFactory::make(
-                    $fromAccount->id,
-                    $transfer->id,
-                    TypeOperation::DEBIT->value,
-                    $transfer->amount + $fee,
-                    $beforeFrom,
-                    $afterFrom
-                ));
+                $this->operationService->credit($toAccount, $transfer->id, $transfer->amount);
 
-                // Credit to account
-                $beforeTo = $toAccount->balance;
-                $toAccount->increment('balance', $transfer->amount);
-                $afterTo = $toAccount->balance;
+                Fee::create(FreeFactory::make($transfer->id, TypeFee::FEE_CHARGED->value, $fee));
 
-                Operation::create(OperationFactory::make(
-                    $toAccount->id,
-                    $transfer->id,
-                    TypeOperation::CREDIT->value,
-                    $transfer->amount,
-                    $beforeTo,
-                    $afterTo
-                ));
+                $this->operationService->credit($systemAccount, $transfer->id, $fee);
 
-                // Update transfer status
-                $transfer->update([
-                    'status' => StatusTransfer::COMPLETED->value,
-                    'processed_at' => now(),
-                ]);
-
-                $beforeSystem = $systemAccount->balance;
-                $systemAccount->increment('balance', $fee);
-                $afterSystem = $systemAccount->balance;
-
-                Fee::create(FreeFactory::make(
-                    $transfer->id,
-                    TypeFee::FEE_CHARGED->value,
-                    $fee
-                ));
-
-                Operation::create(OperationFactory::make(
-                    $systemAccount->id,
-                    $transfer->id,
-                    TypeOperation::CREDIT->value,
-                    $fee,
-                    $beforeSystem,
-                    $afterSystem
-                ));
+                $transfer->markCompleted();
             }
 
             return $transfers;

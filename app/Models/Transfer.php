@@ -51,4 +51,17 @@ class Transfer extends Model
     {
         return $this->hasOne(Fee::class);
     }
+
+    public function ledgerEntry()
+    {
+        return $this->hasOne(LedgerEntry::class);
+    }
+
+    public function markCompleted()
+    {
+        $this->update([
+            'status' => StatusTransfer::COMPLETED->value,
+            'processed_at' => now(),
+        ]);
+    }
 }

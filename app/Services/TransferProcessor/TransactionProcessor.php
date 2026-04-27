@@ -3,20 +3,18 @@
 namespace App\Services\TransferProcessor;
 
 use App\Models\Transfer;
-use App\Repositories\Eloquent\SameTransactionRepository;
 use App\Repositories\Eloquent\TransactionRepository;
-use App\Services\Contracts\FeeCalculatorInterface;
 use App\Services\Contracts\TransferProcessorInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 abstract class TransactionProcessor implements TransferProcessorInterface
 {
-    private TransactionRepository $transactionRepository;
+    protected TransactionRepository $transactionRepository;
 
     public function __construct(TransactionRepository $transactionRepository)
     {
-        $this->transactionRepository = new SameTransactionRepository(app(FeeCalculatorInterface::class));
+        $this->transactionRepository = $transactionRepository;
     }
 
     public abstract function supportsMonoTransfers(Transfer $transfer): bool;
