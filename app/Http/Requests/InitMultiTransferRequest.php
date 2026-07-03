@@ -27,6 +27,7 @@ class InitMultiTransferRequest extends FormRequest
             'transfers.*.from_account_number' => ['required', 'string', 'exists:accounts,account_number'],
             'transfers.*.to_account_number' => ['required', 'string', 'exists:accounts,account_number'],
             'transfers.*.amount' => ['required', 'numeric', 'min:0.01'],
+            'transfers.*.description' => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:255'],
         ];
     }

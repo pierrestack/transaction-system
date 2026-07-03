@@ -83,5 +83,5 @@ abstract class TransactionProcessor implements TransferProcessorInterface
         );
     }
 
-    public abstract function processMultiTransfer(array $transfers): Collection;
+    public abstract function processMultiTransfer(Collection $transfers): Collection;
 }

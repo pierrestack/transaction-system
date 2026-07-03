@@ -165,7 +165,7 @@ abstract class TransactionRepository implements TransactionRepositoryInterface
                     $toAccounts->get($transfer['to_account_number'])->id,
                     $transfer['amount'],
                     $fromAccount->currency_id,
-                    $description
+                    $transfer['description'] ?? $description
                 );
 
                 $transfersList[] = Transfer::create($transferFactory);

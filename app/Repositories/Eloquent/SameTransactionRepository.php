@@ -38,7 +38,7 @@ class SameTransactionRepository extends TransactionRepository
 
             $this->operationService->credit($toAccount, $transfer->id, $transfer->amount);
 
-            $systemAccount = (new Account(['currency_id' => $transfer->currency_id]))->getAccountSystem();
+            $systemAccount = (new Account(['currency_id' => $transfer->currency_id]))->getSystemAccount();
 
             Fee::create(FreeFactory::make($transfer->id, TypeFee::FEE_CHARGED->value, $fee));
 
