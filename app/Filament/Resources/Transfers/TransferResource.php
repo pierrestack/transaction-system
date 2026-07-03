@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Transfers;
 
-use App\Filament\Pages\CreateTransaction;
 use App\Filament\Resources\Transfers\Pages\CreateTransfer;
 use App\Filament\Resources\Transfers\Pages\EditTransfer;
 use App\Filament\Resources\Transfers\Pages\ListTransfers;

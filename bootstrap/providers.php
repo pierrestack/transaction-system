@@ -1,7 +1,11 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\Filament\AdminPanelProvider;
+use App\Providers\TransactionServiceProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\Filament\AdminPanelProvider::class,
-    App\Providers\TransactionServiceProvider::class,
+    AppServiceProvider::class,
+    AdminPanelProvider::class,
+    TransactionServiceProvider::class,
 ];

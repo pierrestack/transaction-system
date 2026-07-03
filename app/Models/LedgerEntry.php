@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\LedgerEntryFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class LedgerEntry extends Model
 {
-    /** @use HasFactory<\Database\Factories\LedgerEntryFactory> */
+    /** @use HasFactory<LedgerEntryFactory> */
     use HasFactory;
 
     protected $fillable = [

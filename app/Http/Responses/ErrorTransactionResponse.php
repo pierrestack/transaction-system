@@ -8,4 +8,4 @@ class ErrorTransactionResponse extends BaseResponse
     {
         parent::__construct(400, $message);
     }
-}  
+}

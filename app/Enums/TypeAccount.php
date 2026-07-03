@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum TypeAccount: string implements HasLabel, HasColor, HasIcon
+enum TypeAccount: string implements HasColor, HasIcon, HasLabel
 {
     case USER = 'user';
     case SYSTEM = 'system';
@@ -21,8 +21,8 @@ enum TypeAccount: string implements HasLabel, HasColor, HasIcon
             self::SYSTEM => 'System',
         };
     }
-    
-    public function getColor(): string | array | null
+
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::USER => 'primary',
@@ -30,7 +30,7 @@ enum TypeAccount: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
             self::USER => Heroicon::User,

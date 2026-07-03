@@ -16,7 +16,7 @@ class TransferFactory
     ): array {
         return [
             'token' => (string) Str::uuid(),
-            'reference' => strtoupper(substr($type, 0, 3)) . '-' . Str::random(10),
+            'reference' => strtoupper(substr($type, 0, 3)).'-'.Str::random(10),
             'type' => $type,
             'sender_account_id' => $senderId,
             'receiver_account_id' => $receiverId,

@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\StatusAccount;
 use App\Enums\TypeAccount;
+use Database\Factories\AccountFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Account extends Model
 {
-    /** @use HasFactory<\Database\Factories\AccountFactory> */
+    /** @use HasFactory<AccountFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -18,7 +19,7 @@ class Account extends Model
         'currency_id',
         'status',
         'type',
-        'system_name'
+        'system_name',
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class Account extends Model
     {
         return $this->hasMany(Operation::class);
     }
+
     public function getSystemAccount()
     {
         return Account::where('currency_id', $this->currency_id)

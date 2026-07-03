@@ -28,7 +28,6 @@ class CrossCurrencyTransferProcessor extends TransactionProcessor
         return $this->transactionRepository->executeMonoTransfer($transfer);
     }
 
-
     public function processMultiTransfer(Collection $transfers): Collection
     {
         // TODO: Implement processMultiTransfer() method.

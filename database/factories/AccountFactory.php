@@ -8,7 +8,6 @@ use App\Models\Account;
 use App\Models\Currency;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use Nette\Utils\Type;
 
 /**
  * @extends Factory<Account>

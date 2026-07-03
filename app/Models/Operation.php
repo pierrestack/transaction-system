@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Enums\TypeOperation;
+use Database\Factories\OperationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Operation extends Model
 {
-    /** @use HasFactory<\Database\Factories\OperationFactory> */
+    /** @use HasFactory<OperationFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -17,7 +18,7 @@ class Operation extends Model
         'type',
         'amount',
         'balance_before',
-        'balance_after'
+        'balance_after',
     ];
 
     protected $casts = [

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 class TransactionService
 {
     private TransactionProcessor $transferProcessor;
+
     private TransferProcessorResolver $processorResolver;
 
     public function __construct(TransactionProcessor $transferProcessor, TransferProcessorResolver $transferProcessorResolver)

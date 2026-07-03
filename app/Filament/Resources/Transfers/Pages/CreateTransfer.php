@@ -8,5 +8,4 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateTransfer extends CreateRecord
 {
     protected static string $resource = TransferResource::class;
-    
 }

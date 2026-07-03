@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use App\Enums\TypeFee;
+use Database\Factories\FeeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Fee extends Model
 {
-    /** @use HasFactory<\Database\Factories\FeeFactory> */
+    /** @use HasFactory<FeeFactory> */
     use HasFactory;
 
     protected $fillable = [

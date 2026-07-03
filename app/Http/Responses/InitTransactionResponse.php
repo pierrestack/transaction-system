@@ -8,7 +8,7 @@ class InitTransactionResponse extends BaseResponse
 {
     public function __construct(Transfer $transfer)
     {
-        parent::__construct(201, $transfer->type->getLabel() . ' initialized successfully', [
+        parent::__construct(201, $transfer->type->getLabel().' initialized successfully', [
             'token' => $transfer->token,
             'reference' => $transfer->reference,
         ]);

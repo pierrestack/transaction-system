@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum TypeOperation: string implements HasLabel, HasColor, HasIcon
+enum TypeOperation: string implements HasColor, HasIcon, HasLabel
 {
     case DEBIT = 'debit';
     case CREDIT = 'credit';
@@ -22,7 +22,7 @@ enum TypeOperation: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::DEBIT => 'danger',
@@ -30,7 +30,7 @@ enum TypeOperation: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
             self::DEBIT => Heroicon::ArrowDownCircle,

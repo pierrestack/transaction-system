@@ -17,9 +17,9 @@ abstract class TransactionProcessor implements TransferProcessorInterface
         $this->transactionRepository = $transactionRepository;
     }
 
-    public abstract function supportsMonoTransfers(Transfer $transfer): bool;
+    abstract public function supportsMonoTransfers(Transfer $transfer): bool;
 
-    public abstract function supportsMultiTransfers(Collection $transfers): bool;
+    abstract public function supportsMultiTransfers(Collection $transfers): bool;
 
     public function initProcessDeposit(array $data): Transfer
     {
@@ -73,7 +73,7 @@ abstract class TransactionProcessor implements TransferProcessorInterface
         );
     }
 
-    public abstract function processMonoTransfer(Transfer $transfer): Transfer;
+    abstract public function processMonoTransfer(Transfer $transfer): Transfer;
 
     public function initMultiTransfer(array $data): Collection
     {
@@ -83,5 +83,5 @@ abstract class TransactionProcessor implements TransferProcessorInterface
         );
     }
 
-    public abstract function processMultiTransfer(Collection $transfers): Collection;
+    abstract public function processMultiTransfer(Collection $transfers): Collection;
 }

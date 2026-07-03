@@ -23,7 +23,7 @@ class TransferProcessorResolver
             }
         }
 
-        throw new \Exception("No processor found");
+        throw new \Exception('No processor found');
     }
 
     public function resolveMultiTransfer(Collection $transfers): TransactionProcessor
@@ -34,6 +34,6 @@ class TransferProcessorResolver
             }
         }
 
-        throw new \Exception("No processor found");
+        throw new \Exception('No processor found');
     }
 }

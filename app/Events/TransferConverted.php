@@ -3,13 +3,10 @@
 namespace App\Events;
 
 use App\Models\Account;
-use App\Models\ExchangeRate;
 use App\Models\Transfer;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
@@ -18,7 +15,9 @@ class TransferConverted
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public Transfer $transfer;
+
     public Account $fromAccount;
+
     public Account $toAccount;
 
     public $exchangeRate;

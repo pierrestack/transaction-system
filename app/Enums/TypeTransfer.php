@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
+enum TypeTransfer: string implements HasColor, HasIcon, HasLabel
 {
     case DEPOSIT = 'deposit';
     case WITHDRAWAL = 'withdrawal';
@@ -24,7 +24,7 @@ enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::DEPOSIT => 'success',
@@ -33,7 +33,7 @@ enum TypeTransfer: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
             self::DEPOSIT => Heroicon::ArrowUpCircle,

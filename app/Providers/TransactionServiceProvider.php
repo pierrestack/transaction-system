@@ -16,7 +16,6 @@ use App\Services\OperationService;
 use App\Services\TransactionService;
 use App\Services\TransferProcessor\CrossCurrencyTransferProcessor;
 use App\Services\TransferProcessor\SameCurrencyTransferProcessor;
-use App\Services\TransferProcessor\TransactionProcessor;
 use App\Services\Validator\TransferValidator;
 use Illuminate\Support\ServiceProvider;
 

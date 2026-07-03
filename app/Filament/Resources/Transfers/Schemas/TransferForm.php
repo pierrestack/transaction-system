@@ -12,7 +12,9 @@ use Filament\Schemas\Schema;
 class TransferForm
 {
     public ?array $depositData = [];
+
     public ?array $withdrawData = [];
+
     public ?array $transferData = [];
 
     public static function configure(Schema $schema): Schema

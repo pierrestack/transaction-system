@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Account;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class AccountSeeder extends Seeder
@@ -25,7 +24,7 @@ class AccountSeeder extends Seeder
             ['account_number' => 'd31767d8-544f-4e3f-bdee-fb12a718ac88', 'balance' => 0.00, 'type' => 'system', 'system_name' => 'fees', 'currency_id' => 9, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
             ['account_number' => 'd31767d8-544f-4e3f-bdee-fb12a718ac89', 'balance' => 0.00, 'type' => 'system', 'system_name' => 'fees', 'currency_id' => 10, 'status' => 'active', 'created_at' => now(), 'updated_at' => now()],
         ];
-        
+
         foreach ($accounts as $account) {
             Account::insert($account);
         }

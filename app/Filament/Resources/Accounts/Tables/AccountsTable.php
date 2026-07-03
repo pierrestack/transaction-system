@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\Accounts\Tables;
 
-use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -21,7 +20,7 @@ class AccountsTable
                     ->searchable(),
                 TextColumn::make('balance')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->currency->symbol)
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->currency->symbol)
                     ->sortable(),
                 TextColumn::make('type')
                     ->badge()

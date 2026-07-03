@@ -6,7 +6,6 @@ use App\Enums\TypeOperation;
 use App\Factories\OperationFactory;
 use App\Models\Account;
 use App\Models\Operation;
-use App\Models\Transfer;
 
 class OperationService
 {

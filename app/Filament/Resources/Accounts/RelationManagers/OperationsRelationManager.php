@@ -31,8 +31,7 @@ class OperationsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('account_number')
-            ->modifyQueryUsing(fn (Builder $query) =>
-                $query->orderBy('created_at', 'desc')
+            ->modifyQueryUsing(fn (Builder $query) => $query->orderBy('created_at', 'desc')
             )
             ->columns([
                 TextColumn::make('type')
@@ -41,13 +40,13 @@ class OperationsRelationManager extends RelationManager
                     ->badge(),
                 TextColumn::make('amount')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->account->currency->symbol),
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->account->currency->symbol),
                 TextColumn::make('balance_before')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->account->currency->symbol),
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->account->currency->symbol),
                 TextColumn::make('balance_after')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ') . ' ' . $record->account->currency->symbol),
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->account->currency->symbol),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

@@ -24,7 +24,7 @@ class ConvertCurrencyService implements ConvertionCurrencyInterface
             $toAccount->currency_id
         );
 
-        if (!$exchangeRateFromAndToCurrency) {
+        if (! $exchangeRateFromAndToCurrency) {
             throw new \Exception('Exchange rate not found for the given currencies.');
         }
 
