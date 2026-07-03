@@ -29,8 +29,9 @@ class CrossCurrencyTransferProcessor extends TransactionProcessor
     }
 
 
-    public function processMultiTransfer(array $transfers): Collection
+    public function processMultiTransfer(Collection $transfers): Collection
     {
         // TODO: Implement processMultiTransfer() method.
+        throw new \RuntimeException('Multi currency transfer processing is not implemented.');
     }
 }

@@ -28,7 +28,7 @@ class SameCurrencyTransferProcessor extends TransactionProcessor
         return $this->transactionRepository->executeMonoTransfer($transfer);
     }
 
-    public function processMultiTransfer(array $transfers): Collection
+    public function processMultiTransfer(Collection $transfers): Collection
     {
         return $this->transactionRepository->executeMultiTransfer($transfers);
     }

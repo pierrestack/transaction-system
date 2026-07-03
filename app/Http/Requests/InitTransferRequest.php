@@ -24,7 +24,7 @@ class InitTransferRequest extends FormRequest
     {
         return [
             'from_account_number' => 'required|exists:accounts,account_number',
-            'to_account_number' => 'required|exists:accounts,account_number|different:from_account_number',
+            'to_account_number' => 'required|exists:accounts,account_number',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:255',
         ];
