@@ -12,8 +12,8 @@ use App\Http\Requests\TransactionRequest;
 use App\Http\Responses\ErrorTransactionResponse;
 use App\Http\Responses\ExecuteMultiTransferResponse;
 use App\Http\Responses\ExecuteTransactionResponse;
-use App\Http\Responses\InitTransactionResponse;
 use App\Http\Responses\InitMultiTransferResponse;
+use App\Http\Responses\InitTransactionResponse;
 use App\Services\TransactionService;
 
 class TransactionController extends Controller
@@ -33,6 +33,7 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new InitTransactionResponse($transfer);
     }
 
@@ -44,6 +45,7 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new ExecuteTransactionResponse($result);
     }
 
@@ -51,10 +53,11 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-             $transfer = $this->service->withdrawal($data);
+            $transfer = $this->service->withdrawal($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new InitTransactionResponse($transfer);
     }
 
@@ -66,6 +69,7 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new ExecuteTransactionResponse($result);
     }
 
@@ -73,10 +77,11 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-             $transfer = $this->service->monoTransfer($data);
+            $transfer = $this->service->monoTransfer($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new InitTransactionResponse($transfer);
     }
 
@@ -88,6 +93,7 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new ExecuteTransactionResponse($result);
     }
 
@@ -95,10 +101,11 @@ class TransactionController extends Controller
     {
         $data = $request->validated();
         try {
-             $transfers = $this->service->multiTransfer($data);
+            $transfers = $this->service->multiTransfer($data);
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new InitMultiTransferResponse($transfers);
     }
 
@@ -110,6 +117,7 @@ class TransactionController extends Controller
         } catch (\Exception $e) {
             return new ErrorTransactionResponse($e->getMessage());
         }
+
         return new ExecuteMultiTransferResponse($result);
     }
 }

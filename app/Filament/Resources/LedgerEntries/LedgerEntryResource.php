@@ -41,8 +41,8 @@ class LedgerEntryResource extends Resource
     {
         return [
             'index' => ListLedgerEntries::route('/'),
-//            'create' => CreateLedgerEntry::route('/create'),
-//            'edit' => EditLedgerEntry::route('/{record}/edit'),
+            //            'create' => CreateLedgerEntry::route('/create'),
+            //            'edit' => EditLedgerEntry::route('/{record}/edit'),
         ];
     }
 }

@@ -19,7 +19,9 @@ use Illuminate\Support\Facades\DB;
 abstract class TransactionRepository implements TransactionRepositoryInterface
 {
     protected FeeCalculatorInterface $feeCalculatorInterface;
+
     protected OperationService $operationService;
+
     protected TransferValidator $transferValidator;
 
     public function __construct(FeeCalculatorInterface $feeCalculatorInterface, OperationService $operationService, TransferValidator $transferValidator)
@@ -141,7 +143,7 @@ abstract class TransactionRepository implements TransactionRepositoryInterface
         });
     }
 
-    public abstract function executeMonoTransfer(Transfer $transfer): Transfer;
+    abstract public function executeMonoTransfer(Transfer $transfer): Transfer;
 
     public function initMultiTransfer(array $transfers, string $description): Collection
     {
@@ -175,5 +177,5 @@ abstract class TransactionRepository implements TransactionRepositoryInterface
         });
     }
 
-    public abstract function executeMultiTransfer(Collection $transfers): Collection;
+    abstract public function executeMultiTransfer(Collection $transfers): Collection;
 }

@@ -34,6 +34,7 @@ class ExchangeRatesBaseRelationManager extends RelationManager
                     ->label('Target currency')
                     ->options(function () {
                         $currencies = Currency::pluck('name', 'id');
+
                         return array_filter($currencies->toArray(), function ($id) {
                             return $id !== $this->ownerRecord->id;
                         }, ARRAY_FILTER_USE_KEY);
@@ -55,12 +56,12 @@ class ExchangeRatesBaseRelationManager extends RelationManager
                     ->searchable(),
                 TextColumn::make('rate')
                     ->label('Exchange rate')
-                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', ' ') . ' ' . $this->ownerRecord->symbol)
+                    ->formatStateUsing(fn ($state) => number_format($state, 2, ',', ' ').' '.$this->ownerRecord->symbol)
                     ->searchable(),
                 TextColumn::make('created_at')
                     ->label('Creation date')
                     ->date('d/m/Y')
-                    ->sortable()
+                    ->sortable(),
             ])
             ->filters([
                 //

@@ -7,7 +7,9 @@ use Illuminate\Contracts\Support\Responsable;
 class BaseResponse implements Responsable
 {
     protected $statusCode;
+
     protected $message;
+
     protected $data;
 
     public function __construct($statusCode = 200, $message = '', $data = null)

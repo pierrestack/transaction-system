@@ -20,8 +20,7 @@ class CrossTransactionRepository extends TransactionRepository
         ConvertionCurrencyInterface $convertionCurrency,
         OperationService $operationService,
         TransferValidator $transferValidator
-    )
-    {
+    ) {
         parent::__construct($feeCalculatorInterface, $operationService, $transferValidator);
         $this->convertionCurrency = $convertionCurrency;
     }

@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\StatusTransfer;
 use App\Enums\TypeTransfer;
+use Database\Factories\TransfertFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Transfer extends Model
 {
-    /** @use HasFactory<\Database\Factories\TransfertFactory> */
+    /** @use HasFactory<TransfertFactory> */
     use HasFactory;
 
     protected $fillable = [

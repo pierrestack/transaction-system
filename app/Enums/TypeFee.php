@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum TypeFee: string implements HasLabel, HasColor, HasIcon
+enum TypeFee: string implements HasColor, HasIcon, HasLabel
 {
     case FEE_CHARGED = 'fee charged';
     case FREE_CHARGED = 'free charged';
@@ -22,7 +22,7 @@ enum TypeFee: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::FEE_CHARGED => 'danger',
@@ -30,7 +30,7 @@ enum TypeFee: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
             self::FEE_CHARGED => Heroicon::XCircle,

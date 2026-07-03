@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum StatusAccount: string implements HasLabel, HasColor, HasIcon
+enum StatusAccount: string implements HasColor, HasIcon, HasLabel
 {
     case ACTIVE = 'active';
     case SUSPENDED = 'suspended';
@@ -24,7 +24,7 @@ enum StatusAccount: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::ACTIVE => 'success',
@@ -33,12 +33,12 @@ enum StatusAccount: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
-            self::ACTIVE    => Heroicon::CheckCircle,
+            self::ACTIVE => Heroicon::CheckCircle,
             self::SUSPENDED => Heroicon::ExclamationTriangle,
-            self::CLOSED    => Heroicon::XCircle,
+            self::CLOSED => Heroicon::XCircle,
         };
     }
 }

@@ -28,7 +28,7 @@ class TransfersTable
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('amount')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' '). ' '. $record->currency->symbol)
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->currency->symbol)
                     ->sortable(),
                 TextColumn::make('type')
                     ->badge()
@@ -41,7 +41,7 @@ class TransfersTable
                 TextColumn::make('fee.amount')
                     ->label('fee')
                     ->numeric()
-                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' '). ' '. $record->currency->symbol)
+                    ->formatStateUsing(fn (string $state, Model $record) => number_format($state, 2, ',', ' ').' '.$record->currency->symbol)
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
@@ -56,9 +56,9 @@ class TransfersTable
                 // EditAction::make(),
             ])
             ->toolbarActions([
-//                BulkActionGroup::make([
-//                    DeleteBulkAction::make(),
-//                ]),
+                //                BulkActionGroup::make([
+                //                    DeleteBulkAction::make(),
+                //                ]),
             ]);
     }
 }

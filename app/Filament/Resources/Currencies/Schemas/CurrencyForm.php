@@ -20,7 +20,7 @@ class CurrencyForm
                             ->required(),
                         TextInput::make('symbol')
                             ->required(),
-                    ])->columnSpanFull()
+                    ])->columnSpanFull(),
             ]);
     }
 }

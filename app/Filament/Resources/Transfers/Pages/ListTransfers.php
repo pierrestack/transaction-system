@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Transfers\Pages;
 
 use App\Filament\Resources\Transfers\TransferResource;
-use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

@@ -4,8 +4,6 @@ namespace App\Listeners;
 
 use App\Events\TransferConverted;
 use App\Models\LedgerEntry;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class StoreFxDetails
 {

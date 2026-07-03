@@ -9,7 +9,7 @@ use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Contracts\Support\Htmlable;
 
-enum StatusTransfer: string implements HasLabel, HasColor, HasIcon
+enum StatusTransfer: string implements HasColor, HasIcon, HasLabel
 {
     case PENDING = 'pending';
     case COMPLETED = 'completed';
@@ -24,7 +24,7 @@ enum StatusTransfer: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getColor(): string | array | null
+    public function getColor(): string|array|null
     {
         return match ($this) {
             self::PENDING => 'warning',
@@ -33,7 +33,7 @@ enum StatusTransfer: string implements HasLabel, HasColor, HasIcon
         };
     }
 
-    public function getIcon(): string | BackedEnum | Htmlable | null
+    public function getIcon(): string|BackedEnum|Htmlable|null
     {
         return match ($this) {
             self::PENDING => Heroicon::Clock,

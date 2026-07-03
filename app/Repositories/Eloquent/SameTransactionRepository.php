@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 
 class SameTransactionRepository extends TransactionRepository
 {
-
     public function __construct(FeeCalculatorInterface $feeCalculatorInterface, OperationService $operationService, TransferValidator $transferValidator)
     {
         parent::__construct($feeCalculatorInterface, $operationService, $transferValidator);
