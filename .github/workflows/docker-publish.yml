@@ -1,0 +1,71 @@
+name: Publish Docker Image
+
+
+on:
+
+  push:
+
+    tags:
+
+      - "v*"
+
+
+jobs:
+
+
+  docker:
+
+
+    name: Build and Push Docker Image
+
+    runs-on: ubuntu-22.04
+
+
+
+    steps:
+
+
+      - name: Checkout repository
+
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+
+
+      - name: Login Docker Hub
+
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.4.0
+
+        with:
+
+          username: ${{ secrets.DOCKER_USERNAME }}
+
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+
+
+      - name: Extract metadata
+        id: meta
+
+        uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.7.0
+
+        with:
+
+          images: ${{ secrets.DOCKER_USERNAME }}/transaction-system
+
+
+
+      - name: Build and Push image
+
+        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+
+        with:
+
+          context: .
+
+          push: true
+
+          tags: |
+
+            ${{ secrets.DOCKER_USERNAME }}/transaction-system:${{ github.ref_name }}
+
+            ${{ secrets.DOCKER_USERNAME }}/transaction-system:latest
