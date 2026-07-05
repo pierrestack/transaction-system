@@ -1,0 +1,76 @@
+name: Build Docker
+
+
+on:
+
+  workflow_call:
+
+    outputs:
+
+      image:
+        description: Docker image tag
+        value: ${{ jobs.build.outputs.image }}
+
+
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-22.04
+
+
+    outputs:
+
+      image: ${{ steps.meta.outputs.tag }}
+
+
+
+    steps:
+
+
+      - name: Checkout
+
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+
+
+      - name: Generate image tag
+
+        id: meta
+
+        run: |
+
+          echo "tag=transaction-system-ci:${GITHUB_SHA}" >> $GITHUB_OUTPUT
+
+
+
+      - name: Build image
+
+        run: |
+
+          docker build \
+          -t ${{ steps.meta.outputs.tag }} \
+          .
+
+
+
+      - name: Save Docker image
+
+        run: |
+
+          docker save \
+          ${{ steps.meta.outputs.tag }} \
+          -o transaction-system-ci.tar
+
+
+
+      - name: Upload Docker image
+
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+
+        with:
+
+          name: transaction-system-ci
+
+          path: transaction-system-ci.tar

@@ -1,0 +1,45 @@
+name: CI
+
+
+on:
+
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+
+permissions:
+
+  contents: read
+
+
+
+jobs:
+
+  build:
+
+    name: Build Docker Image
+
+    uses: ./.github/workflows/build.yml
+
+
+  quality:
+
+    name: Code Quality
+
+    needs: build
+
+    uses: ./.github/workflows/quality.yml
+
+
+  tests:
+
+    name: Laravel Tests
+
+    needs: build
+
+    uses: ./.github/workflows/tests.yml

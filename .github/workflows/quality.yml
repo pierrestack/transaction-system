@@ -1,0 +1,50 @@
+name: Quality
+
+
+on:
+
+  workflow_call:
+
+
+
+jobs:
+
+  quality:
+
+
+    runs-on: ubuntu-22.04
+
+
+    steps:
+
+
+      - name: Checkout
+
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        
+
+      - name: Download Docker image
+
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
+
+        with:
+
+          name: transaction-system-ci
+
+
+
+      - name: Load Docker image
+
+        run: |
+
+          docker load \
+          -i transaction-system-ci.tar
+
+
+      - name: Pint
+
+        run: |
+
+          docker run --rm \
+          transaction-system-ci:${GITHUB_SHA} \
+          vendor/bin/pint --test
